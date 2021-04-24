@@ -35,7 +35,7 @@ def average_vive_data(vive_data: List[np.ndarray]) -> List[np.ndarray]:
 
 
 def std_vive_data(vive_data: List[np.ndarray]) -> List[np.ndarray]:
-    return [np.std(vive_data, axis=0) for data in vive_data]
+    return [np.std(data, axis=0) for data in vive_data]
 
 
 def cut_laser_data(laser_data: np.ndarray) -> np.ndarray:
@@ -195,9 +195,9 @@ def pre_process_data(vive_data: List[np.ndarray],
     Returns:
         Tuple[List[np.ndarray], List[np.ndarray], np.ndarray]: vive, std_vive,laser
     """
-    proc_laser_data, tripod_moved = pre_process_laser(laser_data)
+    laser_data, tripod_moved = pre_process_laser(laser_data)
     if delete_data:
-        vive_data, laser_data = delete_corrupted_data(vive_data, proc_laser_data, tripod_moved)
+        vive_data, laser_data = delete_corrupted_data(vive_data, laser_data, tripod_moved)
     proc_vive_data, std_vive = pre_process_vive(vive_data)
     return proc_vive_data, std_vive, laser_data
 
