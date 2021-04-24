@@ -5,10 +5,10 @@ import numpy as np
 from scipy.spatial.transform import Rotation as R
 from more_itertools import chunked
 
-from data_types import VivePoint, LaserPoint
+from modules.data_types import VivePoint, LaserPoint
 from utils.linear_algebra_helper import transform_to_homogenous_matrix, build_coordinate_system_via_3_points
-from utils.read_measurement_files import get_laser_data, get_vive_points
-from pre_process_data import pre_process_data
+from modules.read_measurement_files import get_laser_data, get_vive_points
+from modules.pre_process_data import pre_process_data
 
 
 def build_vive_points(vive_data: List[np.ndarray], std: np.ndarray) -> List[VivePoint]:

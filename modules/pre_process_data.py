@@ -7,9 +7,10 @@ laser are near one oneanother (see the experiment process documentation)
 """
 from typing import List, Tuple, Union
 
-from utils.read_measurement_files import get_vive_points
 import numpy as np
 from loguru import logger
+
+from modules.read_measurement_files import get_vive_points
 
 
 def average_vive_data(vive_data: List[np.ndarray]) -> List[np.ndarray]:
@@ -196,6 +197,7 @@ def pre_process_data(vive_data: List[np.ndarray],
         Tuple[List[np.ndarray], List[np.ndarray], np.ndarray]: vive, std_vive,laser
     """
     laser_data, tripod_moved = pre_process_laser(laser_data)
+    logger.info(f"There are {np.sum(tripod_moved)} laser points out of std range")
     if delete_data:
         vive_data, laser_data = delete_corrupted_data(vive_data, laser_data, tripod_moved)
     proc_vive_data, std_vive = pre_process_vive(vive_data)
@@ -203,7 +205,7 @@ def pre_process_data(vive_data: List[np.ndarray],
 
 
 if __name__ == "__main__":
-    from utils.read_measurement_files import get_laser_data
+    from modules.read_measurement_files import get_laser_data
     laser_data = get_laser_data(date="20201001", experiment_number=1)
     vive_data = get_vive_points(date="20201001", experiment_number=1)
 
