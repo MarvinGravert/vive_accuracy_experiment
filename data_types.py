@@ -9,13 +9,14 @@ from scipy.spatial.transform import Rotation as R
 class DataPoint():
     position: List[float]
     # Rotation: Always from the point to the zero (either lighthouse or base KOS in laser
-    quaternion: np.ndarray  # scalar first
     hom_matrix: np.ndarray
 
 
+@dataclass
 class VivePoint(DataPoint):
     std: float
 
 
+@dataclass
 class LaserPoint(DataPoint):
     pass
