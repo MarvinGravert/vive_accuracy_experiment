@@ -68,3 +68,35 @@ def transform_to_homogenous_matrix(
     p = np.array(position).reshape((-1, 1))
     temp = np.hstack((r.as_matrix(), p))
     return np.vstack((temp, [0, 0, 0, 1]))
+
+
+def build_coordinate_system_via_3_points(origin, x_axis_point, y_axis_point) -> np.ndarray:
+    """utilising 3 non colinear points build a coordinate system with its origin
+    and axis lying at the coordinates handed over
+
+
+    Args:
+        origin (np.ndarray): 3D point
+        x_axis_point (np.ndarray): 3D point along the new axis
+        y_axis_point (np.ndarray): 3D point along the new yaxis
+
+    Returns:
+        np.ndarray: Returns the transformation from new to old coordinate system
+    """
+    x_axis = x_axis_point-origin
+    x_axis = x_axis/np.linalg.norm(x_axis)
+    y_axis = y_axis_point-origin
+    y_axis = y_axis/np.linalg.norm(y_axis)
+    # build z axis
+    z_axis = np.cross(x_axis, y_axis)
+    y_axis = np.cross(z_axis, x_axis)  # make sure 90° between x and y
+    rot = np.column_stack((x_axis, y_axis, z_axis))
+    return combine_to_homogeneous_matrix(rotation_matrix=rot, translation_vector=origin)
+
+
+if __name__ == "__main__":
+    t = build_coordinate_system_via_3_points(
+        np.array([1, 0, 0]),
+        np.array([4, 1, 0]),
+        np.array([1, 4, 0]))
+    print(t)
