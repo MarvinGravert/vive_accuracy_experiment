@@ -7,6 +7,9 @@ from scipy.spatial.transform import Rotation as R
 from utils.linear_algebra_helper import extract_position_and_quaternion_from_homogeneous_matrix
 from modules.build_data import get_vive_laser_points
 from modules.data_types import DataPoint, LaserPoint, VivePoint
+from more_itertools import distinct_combinations
+
+VIVE_CENTER_FROM_LASER = np.array([62, 62, 0])  # mm in laser coordinate system
 
 
 def point_to_point_distance(start_system: DataPoint,
@@ -45,19 +48,36 @@ def relative_distance_points(vive_points: List[VivePoint],
                              pair_list: Tuple[Tuple[int]],
                              norm_length: float = 1500,
                              range_percentage: float = 0.05) -> List[float]:
+    """calculates the difference between the length reported by the laser and by the
+    vive for the given pairs of measurement positions
+
+
+
+    Args:
+        vive_points (List[VivePoint]): positions as measured by the vive
+        laser_points (List[LaserPoint]): positions as measured by the laser
+        pair_list (Tuple[Tuple[int]]): measurement positions between those we distance shall be calculated
+        norm_length (float, optional): distance of points which we are interested in (mm). Defaults to 1500.
+        range_percentage (float, optional): range around the length of interest. Defaults to 0.05.
+
+    Returns:
+        List[float]: list of distance difference between the pairs, points pairs corresponding to the error
+    """
     error_list = list()
+    considered_pairs = list()
     lower_bound = norm_length*(1-range_percentage)
     upper_bound = norm_length*(1+range_percentage)
     for start, end in pair_list:
         laser_dist = point_to_point_distance(start_system=laser_points[start],
                                              end_system=laser_points[end],
-                                             point=np.array([62, 62, 0]))
+                                             point=VIVE_CENTER_FROM_LASER)
         vive_dist = point_to_point_distance(vive_points[start],
                                             vive_points[end])
         if laser_dist > lower_bound and laser_dist < upper_bound:
+            considered_pairs.append((start, end))
             error_list.append(abs(laser_dist-vive_dist*1000))
 
-    return error_list
+    return error_list, considered_pairs
 
 
 def relative_angle_error(matrix):
@@ -67,19 +87,46 @@ def relative_angle_error(matrix):
 
 def relative_angle_distance(vive_points: List[VivePoint],
                             laser_points: List[LaserPoint],
-                            pair_list: Tuple[Tuple[int]]) -> List[float]:
+                            pair_list: Tuple[Tuple[int]],
+                            norm_length: float = 1500,
+                            range_percentage: float = 0.05) -> List[float]:
 
+    considered_pairs = list()
     error_list = list()
+    lower_bound = norm_length*(1-range_percentage)
+    upper_bound = norm_length*(1+range_percentage)
     for start, end in pair_list:
-        vive_matrix = np.linalg.inv(vive_points[end].hom_matrix)@vive_points[start].hom_matrix
-        laser_matrix = np.linalg.inv(laser_points[end].hom_matrix)@laser_points[start].hom_matrix
+        laser_dist = point_to_point_distance(start_system=laser_points[start],
+                                             end_system=laser_points[end],
+                                             point=VIVE_CENTER_FROM_LASER)
 
-        vive_angle = relative_angle_error(vive_matrix[:3, :3])
-        laser_angle = relative_angle_error(laser_matrix[:3, :3])
-        error_list.append(abs(vive_angle-laser_angle))
         if laser_dist > lower_bound and laser_dist < upper_bound:
-            error_list.append(abs(laser_dist-vive_dist*1000))
-    return error_list
+            # calc the hom matrix for moving from start->end in vive and laser
+            vive_matrix = np.linalg.inv(
+                vive_points[end].hom_matrix)@vive_points[start].hom_matrix
+            laser_matrix = np.linalg.inv(
+                laser_points[end].hom_matrix)@laser_points[start].hom_matrix
+            # extract the angle from the rotation matrix
+            vive_angle = relative_angle_error(vive_matrix[:3, :3])
+            laser_angle = relative_angle_error(laser_matrix[:3, :3])
+            # add pairs and angle difference
+            considered_pairs.append((start, end))
+            error_list.append(abs(vive_angle-laser_angle))
+
+    return error_list, considered_pairs
+
+
+def good_point_pairs(vive_points, laser_points):
+    num_measurement_points = len(vive_points)
+
+    distinct_point_pairs = list(distinct_combinations(range(num_measurement_points), r=2))
+
+    error_list, pairs = relative_distance_points(vive_points=vive_points,
+                                                 laser_points=laser_points,
+                                                 pair_list=distinct_point_pairs)
+
+    for e, p in zip(error_list, pairs):
+        print(e, "  ", p)
 
 
 if __name__ == "__main__":
@@ -87,17 +134,12 @@ if __name__ == "__main__":
     experiment_number = 1
     vive_points, laser_points = get_vive_laser_points(date, experiment_number)
 
-    col_0 = np.ones((20, 1), dtype=int)*4
-    col_1 = np.arange(20).reshape((-1, 1))
-    p_list = np.column_stack((col_0, col_1))
-    # p_list = ((0, 1), (1, 2), (2, 3), (4, 5), (5, 6))
+    num_measurement_points = len(vive_points)
 
-    t = relative_distance_points(vive_points=vive_points,
-                                 laser_points=laser_points,
-                                 pair_list=p_list)
-    # print(t)
+    distinct_point_pairs = list(distinct_combinations(range(num_measurement_points), r=2))
 
     t = relative_angle_distance(vive_points=vive_points,
                                 laser_points=laser_points,
-                                pair_list=p_list)
+                                pair_list=distinct_point_pairs)
     print(t)
+    # good_point_pairs(vive_points[9:18], laser_points[9:18])
