@@ -43,30 +43,6 @@ def plot_cumultive_distribution(data_list: List[float]):
     plt.show()
 
 
-def single_layer_data_plot(date,
-                           experiment_number,
-                           norm_length,
-                           range_percentage,
-                           start_layer,
-                           end_layer) -> Tuple[List[float],
-                                               Tuple[int, int]]:
-
-    # data preperation
-    vive_points, laser_points = get_vive_laser_points(date, experiment_number)
-
-    # create only point pairs from the layers given
-
-    distinct_point_pairs = distinct_combinations(range(start_layer, end_layer), r=2)
-
-    error_list, pairs = relative_distance_points(vive_points=vive_points,
-                                                 laser_points=laser_points,
-                                                 pair_list=distinct_point_pairs,
-                                                 norm_length=norm_length,
-                                                 range_percentage=range_percentage)
-
-    return error_list, pairs
-
-
 def cumultive_layer_plot_main():
     print(len(overall_error_list))
     print(len(vive_points))

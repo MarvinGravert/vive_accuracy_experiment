@@ -116,6 +116,27 @@ def relative_angle_distance(vive_points: List[VivePoint],
     return error_list, considered_pairs
 
 
+def range_based_error_calculation(vive_points,
+                                  laser_points,
+                                  norm_length,
+                                  range_percentage,
+                                  start_point,
+                                  end_point) -> Tuple[List[float],
+                                                      Tuple[int, int]]:
+
+    # create only point pairs from within the range given
+
+    distinct_point_pairs = distinct_combinations(range(start_point, end_point), r=2)
+
+    error_list, pairs = relative_distance_points(vive_points=vive_points,
+                                                 laser_points=laser_points,
+                                                 pair_list=distinct_point_pairs,
+                                                 norm_length=norm_length,
+                                                 range_percentage=range_percentage)
+
+    return error_list, pairs
+
+
 def good_point_pairs(vive_points, laser_points):
     num_measurement_points = len(vive_points)
 
