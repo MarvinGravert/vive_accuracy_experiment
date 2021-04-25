@@ -88,6 +88,15 @@ def check_tripod_moved(laser_data: np.ndarray, std=0.01) -> np.ndarray:
     resulting_has_moved = np.ones((has_not_moved.shape[0], 1))
     for i, row in enumerate(has_not_moved):
         resulting_has_moved[i, :] = row.all()
+    """
+    Print the distance for those rows that exceed the distance betwen origin
+    and control point
+    """
+    for i, row in enumerate(resulting_has_moved):
+        if row == False:
+            distance = init_pos_list[i]-control_pos_list[i]
+            # i+1 because atm we are not considering the origin of the laser system
+            logger.warning(f"Point {i+1}: Distance between origin and control: {distance}")
     # atm 1 would signal not moved=>not super apparent=> invert
     return np.where((resulting_has_moved == 1) | (resulting_has_moved == 0),
                     1 - resulting_has_moved, resulting_has_moved)
