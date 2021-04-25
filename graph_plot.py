@@ -31,7 +31,7 @@ def main():
 err, pairs, laser_points = main()
 G = nx.Graph()
 for weight, edg in zip(err, pairs):
-    G.add_edges_from([(*edg, {"weight": weight})])
+    G.add_edges_from([(*edg, {"weight": round(weight, 2)})])
 print(G.nodes)
 print(G.edges)
 # nx.draw(G, with_labels=True, font_weight='bold')
@@ -45,5 +45,7 @@ pos = {
 }
 nx.draw(G, pos, node_color='b', edgelist=edges, edge_color=weights, width=10.0,
         edge_cmap=plt.cm.Blues, with_labels=True, font_weight='bold')
+labels = nx.get_edge_attributes(G, 'weight')
+nx.draw_networkx_edge_labels(G, pos,  edge_labels=labels)
 plt.gca().invert_xaxis()
 plt.show()
