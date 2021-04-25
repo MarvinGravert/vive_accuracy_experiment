@@ -125,8 +125,8 @@ def range_based_error_calculation(vive_points,
                                                       Tuple[int, int]]:
 
     # create only point pairs from within the range given
-
-    distinct_point_pairs = distinct_combinations(range(start_point, end_point), r=2)
+    # the plus 1 is added to ensure the range also includes the last point of the layer
+    distinct_point_pairs = distinct_combinations(range(start_point, end_point+1), r=2)
 
     error_list, pairs = relative_distance_points(vive_points=vive_points,
                                                  laser_points=laser_points,
