@@ -129,3 +129,5 @@ dmypy.json
 .pyre/
 
 **/*.vscode
+# remove legagcy folder from tracking for the moment
+analysis 
