@@ -9,7 +9,7 @@ from modules.build_data import get_vive_laser_points
 from modules.data_types import DataPoint, LaserPoint, VivePoint
 from more_itertools import distinct_combinations
 
-VIVE_CENTER_FROM_LASER = np.array([62, 62, 0])  # mm in laser coordinate system
+VIVE_CENTER_FROM_LASER = np.array([62, 62, -10])  # mm in laser coordinate system
 
 
 def point_to_point_distance(start_system: DataPoint,
@@ -130,8 +130,8 @@ def good_point_pairs(vive_points, laser_points):
 
 
 if __name__ == "__main__":
-    date = "20201001"
-    experiment_number = 1
+    date = "20200918"
+    experiment_number = 3
     vive_points, laser_points = get_vive_laser_points(date, experiment_number)
 
     num_measurement_points = len(vive_points)
@@ -141,5 +141,5 @@ if __name__ == "__main__":
     t = relative_angle_distance(vive_points=vive_points,
                                 laser_points=laser_points,
                                 pair_list=distinct_point_pairs)
-    print(t)
+    print(num_measurement_points)
     # good_point_pairs(vive_points[9:18], laser_points[9:18])

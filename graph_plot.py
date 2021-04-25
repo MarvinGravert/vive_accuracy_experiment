@@ -8,8 +8,8 @@ from data_analysis import relative_distance_points, relative_angle_distance
 
 
 def main():
-    date = "20201001"
-    experiment_number = 1
+    date = "20200918"
+    experiment_number = 3
     norm_length = 1500  # mm
     range_percentage = 0.1  # 5%
     # data preperation

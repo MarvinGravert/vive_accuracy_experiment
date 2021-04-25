@@ -19,12 +19,15 @@ def plot_cumultive_distribution(data_list: List[float]):
     n = len(data_list)
     x = np.sort(data_list)
     y = np.arange(n)/n
+
+    acc = round(np.mean(data_list), 2)
+    std = round(np.std(data_list), 2)
     # plotting
     # popt, pcov = curve_fit(func, x, y)
     plt.xlabel('Längenfehler [mm]')
     plt.ylabel('Kumulative Verteilung')
 
-    plt.title('Statische Genauigkeitsanalyse: kumulativer Längenfehler')
+    plt.title(f'Statische Genauigkeitsanalyse: kumulativer Längenfehler\n{acc}+-{std}')
 
     plt.scatter(x, y, marker='o')
     # plt.plot(x, func(x, *popt), 'r-', label="Fitted Curve")
@@ -41,8 +44,8 @@ def plot_cumultive_distribution(data_list: List[float]):
 
 
 def cumultive_plot_main():
-    date = "20201001"
-    experiment_number = 1
+    date = "20200918"
+    experiment_number = 3
     norm_length = 1500  # mm
     range_percentage = 0.1  # 5%
     # data preperation
