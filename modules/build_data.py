@@ -59,7 +59,7 @@ def get_vive_laser_points(date: str, experiment_number: int) -> Tuple[List[ViveP
                                                                       List[LaserPoint]]:
     laser_data = get_laser_data(date=date, experiment_number=experiment_number)
     vive_data = get_vive_points(date=date, experiment_number=experiment_number)
-    vive, vive_std, laser = pre_process_data(vive_data, laser_data)
+    vive, vive_std, laser = pre_process_data(vive_data, laser_data, delete_data=False)
     # print(laser)
     laser_points = build_laser_points(laser_data=laser)
     vive_points = build_vive_points(vive_data=vive, std=vive_std)
