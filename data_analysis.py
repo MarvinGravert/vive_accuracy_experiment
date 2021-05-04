@@ -137,6 +137,33 @@ def range_based_error_calculation(vive_points,
     return error_list, pairs
 
 
+def get_multi_experiment_data(
+    date_exp_num_layer_list: Tuple[Tuple[str, int, List[Tuple[int, int]]]],
+    norm_length: float,
+    range_percentage: float
+) -> Tuple[List[float], List[Tuple[int, int]], List[VivePoint]]:
+
+    overall_error_list = list()
+    overall_pair_list = list()
+    overall_vive_points_list = list()
+    for date, experiment_number, layer_list in date_exp_num_layer_list:
+        vive_points, laser_points = get_vive_laser_points(date, experiment_number)
+        overall_vive_points_list.extend(vive_points)
+        for start_layer, end_layer in layer_list:
+
+            error_list, pairs = range_based_error_calculation(vive_points=vive_points,
+                                                              laser_points=laser_points,
+                                                              norm_length=norm_length,
+                                                              range_percentage=range_percentage,
+                                                              start_point=start_layer,
+                                                              end_point=end_layer)
+
+            overall_error_list.extend(error_list)
+            overall_pair_list.extend(pairs)
+
+    return overall_error_list, overall_pair_list, overall_vive_points_list
+
+
 def good_point_pairs(vive_points, laser_points):
     num_measurement_points = len(vive_points)
 

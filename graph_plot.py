@@ -8,10 +8,10 @@ from data_analysis import relative_distance_points, relative_angle_distance
 
 
 def main():
-    date = "20200918"
+    date = "20201001"
     experiment_number = 2
-    norm_length = 1500  # mm
-    range_percentage = 0.06  # 5%
+    norm_length = 600  # mm
+    range_percentage = 0.5  # 5%
     # data preperation
     vive_points, laser_points = get_vive_laser_points(date, experiment_number)
     vive_points = vive_points[:]
@@ -19,7 +19,9 @@ def main():
     # processing
     num_measurement_points = len(vive_points)
     distinct_point_pairs = distinct_combinations(range(num_measurement_points), r=2)
-
+    measurement_points = list(range(27, 34))  # +[4, 13, 22]
+    distinct_point_pairs = distinct_combinations(measurement_points, r=2)
+    # start calculation
     error_list, pairs = relative_distance_points(vive_points=vive_points,
                                                  laser_points=laser_points,
                                                  pair_list=distinct_point_pairs,
